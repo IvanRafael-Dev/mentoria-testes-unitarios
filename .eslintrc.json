@@ -4,6 +4,10 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    
+    "@typescript-eslint/semi": ["error", "always"],
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "@typescript-eslint/consistent-type-imports": "off",
+    "@typescript-eslint/no-invalid-void-type": "off",
+    "@typescript-eslint/consistent-type-assertions": "off"
   }
 }
