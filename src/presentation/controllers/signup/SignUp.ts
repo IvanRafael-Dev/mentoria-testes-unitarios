@@ -6,5 +6,9 @@ export default class SignUpController {
     if (!req.body.username) {
       throw new MissingParamError('Missing param: username');
     }
+
+    if (!req.body.email) {
+      throw new MissingParamError('Missing param: email');
+    }
   }
 }
