@@ -1,42 +1,48 @@
 import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import sinon from 'sinon';
 import SignUpController from './SignUp';
-import MissingParamError from '../../../errors/missing-param-error';
-import { makeReqRes } from '../../../test/utils/makeReqRes';
+import MakeSinonReqRes, { ReqResNext } from '../../../test/utils/makeReqRes';
+import { Validation } from '../../../services/validation/protocols/validation';
 
-chai.use(chaiAsPromised);
+interface User {
+  id?: number
+  username: string
+  email: string
+  password: string
+}
 
-const makeSut = (): SignUpController => {
-  return new SignUpController();
+interface SutTypes {
+  sut: SignUpController
+  validateUserFieldsStub: Validation
+}
+
+const makeRequestObject = (body: any, params: string): ReqResNext => {
+  return new MakeSinonReqRes(body, params).makeReqRes();
+};
+
+const makeSut = (): SutTypes => {
+  class ValidateUserFieldsStub implements Validation {
+    validate (user: User): void {}
+  }
+  const validateUserFieldsStub = new ValidateUserFieldsStub();
+  const sut = new SignUpController(validateUserFieldsStub);
+
+  return {
+    sut,
+    validateUserFieldsStub
+  };
 };
 
 describe('SignUpController', () => {
-  it('should throw MissingParamError if no username is provided', async () => {
-    const sut = makeSut();
-    const { req, res, next } = makeReqRes();
-
-    return await expect(sut.create(req, res, next))
-      .to.rejectedWith(MissingParamError, 'Missing param: username');
-  });
-
-  it('should throw MissingParamError if no email is provided', async () => {
-    const sut = makeSut();
-    const { req, res, next } = makeReqRes({
-      username: 'any_username'
-    });
-
-    return await expect(sut.create(req, res, next))
-      .to.rejectedWith(MissingParamError, 'Missing param: email');
-  });
-
-  it('should throw MissingParamError if no password is provided', async () => {
-    const sut = makeSut();
-    const { req, res, next } = makeReqRes({
+  it('should call Validations with correct values', async () => {
+    const { sut, validateUserFieldsStub } = makeSut();
+    const validateSpy = sinon.spy(validateUserFieldsStub, 'validate');
+    const { req, res, next } = makeRequestObject({
       username: 'any_username',
-      email: 'any_email@mail.com'
-    });
-
-    return await expect(sut.create(req, res, next))
-      .to.rejectedWith(MissingParamError, 'Missing param: password');
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    }, '');
+    sut.create(req, res, next);
+    expect(validateSpy.calledWith(req.body)).to.be.true;
   });
 });
