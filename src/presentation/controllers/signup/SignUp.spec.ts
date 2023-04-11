@@ -27,7 +27,7 @@ const makeSut = (): SignUpController => {
 };
 
 describe('SignUpController', () => {
-  it('should return 400 if no username is provided', async () => {
+  it('should throw MissingParamError if no username is provided', async () => {
     const sut = makeSut();
     const { req, res, next } = makeReqRes();
 
@@ -35,7 +35,7 @@ describe('SignUpController', () => {
       .to.rejectedWith(MissingParamError, 'Missing param: username');
   });
 
-  it('should return 400 if no email is provided', async () => {
+  it('should throw MissingParamError if no email is provided', async () => {
     const sut = makeSut();
     const { req, res, next } = makeReqRes({
       username: 'any_username'
@@ -45,7 +45,7 @@ describe('SignUpController', () => {
       .to.rejectedWith(MissingParamError, 'Missing param: email');
   });
 
-  it('should return 400 if no password is provided', async () => {
+  it('should throw MissingParamError if no password is provided', async () => {
     const sut = makeSut();
     const { req, res, next } = makeReqRes({
       username: 'any_username',
