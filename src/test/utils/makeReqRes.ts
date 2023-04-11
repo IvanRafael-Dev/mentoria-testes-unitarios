@@ -7,11 +7,21 @@ export interface ReqResNext {
   next: NextFunction
 }
 
-export const makeReqRes = (body: any = {}, params?: string): ReqResNext => {
-  const req = { body, params } as unknown as Request;
-  const res = {} as Response;
-  const next = sinon.spy() as NextFunction;
-  res.status = sinon.stub().returns(res);
-  res.json = sinon.stub();
-  return { req, res, next };
-};
+export default class MakeSinonReqRes {
+  private readonly body: any;
+  private readonly params: string;
+
+  constructor (body: any, params: string) {
+    this.body = body;
+    this.params = params;
+  }
+
+  public makeReqRes (): ReqResNext {
+    const req = { body: this.body, params: this.params } as unknown as Request;
+    const res = {} as Response;
+    const next = sinon.spy() as NextFunction;
+    res.status = sinon.stub().returns(res);
+    res.json = sinon.stub();
+    return { req, res, next };
+  }
+}
