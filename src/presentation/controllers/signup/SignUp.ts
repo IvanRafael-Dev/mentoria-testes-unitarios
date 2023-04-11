@@ -8,6 +8,10 @@ export default class SignUpController {
   }
 
   create (req: Request, res: Response, next: NextFunction): void {
-    this._validateUserFields.validate(req.body);
+    try {
+      this._validateUserFields.validate(req.body);
+    } catch (error) {
+      next(error);
+    }
   }
 }
