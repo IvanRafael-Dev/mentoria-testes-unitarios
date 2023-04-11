@@ -10,5 +10,9 @@ export default class SignUpController {
     if (!req.body.email) {
       throw new MissingParamError('Missing param: email');
     }
+
+    if (!req.body.password) {
+      throw new MissingParamError('Missing param: password');
+    }
   }
 }
