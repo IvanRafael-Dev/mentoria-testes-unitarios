@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import MissingParamError from '../errors/missing-param-error';
-import { makeReqRes } from '../test/utils/makeReqRes';
 import RequiredFields, { RequiredFieldsOptions } from './RequiredFields';
+import MakeSinonReqRes, { ReqResNext } from '../test/utils/makeReqRes';
 
 const makeSut = (): RequiredFields => {
   const requiredFieldsOptions: RequiredFieldsOptions = {
@@ -12,6 +12,10 @@ const makeSut = (): RequiredFields => {
   return requiredFields;
 };
 
+const makeReqRes = (body: any, params: string): ReqResNext => {
+  return new MakeSinonReqRes(body, params).makeReqRes();
+};
+
 describe('RequiredFields', () => {
   describe('when signup required fields are not provided', () => {
     it('should throw MissingParamError if no username is provided', async () => {
@@ -19,7 +23,7 @@ describe('RequiredFields', () => {
       const { req, res, next } = makeReqRes({
         email: 'any_email@mail.com',
         password: 'any_password'
-      });
+      }, '');
       expect(() => sut.verify('user')(req, res, next)).to.throw(MissingParamError, 'Missing param: username');
     });
 
@@ -28,7 +32,7 @@ describe('RequiredFields', () => {
       const { req, res, next } = makeReqRes({
         username: 'any_username',
         password: 'any_password'
-      });
+      }, '');
       expect(() => sut.verify('user')(req, res, next)).to.throw(MissingParamError, 'Missing param: email');
     });
 
@@ -37,7 +41,7 @@ describe('RequiredFields', () => {
       const { req, res, next } = makeReqRes({
         username: 'any_username',
         email: 'any_email@mail.com'
-      });
+      }, '');
       expect(() => sut.verify('user')(req, res, next)).to.throw(MissingParamError, 'Missing param: password');
     });
   });
@@ -49,7 +53,7 @@ describe('RequiredFields', () => {
         username: 'any_username',
         email: 'any_email@mail.com',
         password: 'any_password'
-      });
+      }, '');
       sut.verify('user')(req, res, next);
       expect((next as sinon.SinonSpy).calledOnce).to.be.true;
     });
